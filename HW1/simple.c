@@ -6,20 +6,20 @@
 #include <linux/list.h>
 #include <linux/types.h>
 
+// Define our struct
+struct birthday {
+    int day;
+    int month;
+    int year;
+    struct list_head list; // list_head defined in <linux/types.h> [next, prev]
+};
+
+// Declare our object to use (birthday_list)[typeof: struct list_head]
+static LIST_HEAD(birthday_list); // struct list_head birthday_list;
+
 // This function is called when the module is loaded.
 static int __init simple_init(void) {
-    printk(KERN_INFO "Loading Birthday Module\n");
-
-    // Define our struct
-    struct birthday {
-        int day;
-        int month;
-        int year;
-        struct list_head list; // list_head defined in <linux/types.h> [next, prev]
-    };
-
-    // Declare our object to use (birthday_list)[typeof: struct list_head]
-    static LIST_HEAD(birthday_list); // struct list_head birthday_list;
+    printk(KERN_NOTICE "Loading Birthday Module\n");
 
     // Create our first birthday object
     struct birthday *person;
@@ -72,7 +72,19 @@ static int __init simple_init(void) {
 
 // This function is called when the module is removed.
 static void __exit simple_exit(void) {
-    printk(KERN_INFO "Removing Module\n");
+    printk(KERN_NOTICE "Removing Birthday Module\n");
+
+    // Now we want to remove our linked list in reverse order.
+    struct birthday *ptr; // Used for traversing the list [location]
+    list_for_each_entry_reverse(ptr, &birthday_list, list) {
+        printk(KERN_INFO "Removing Birthday! Day: %d\tMonth: %d\tYear: %d\t\n", ptr -> day, ptr -> month, ptr -> year);
+        
+        // Delete our entry from the list
+        __list_del_entry(&ptr -> list);
+
+        // Claim back our allocated memory
+        kfree(ptr);
+    }
 }
 
 // Macros for registering module entry and exit points.
