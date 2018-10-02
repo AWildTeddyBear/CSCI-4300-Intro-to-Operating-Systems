@@ -12,7 +12,9 @@ static int __init simple_init(void) {
 
     // Define our struct
     struct birthday {
-        int day, month, year;
+        int day;
+        int month;
+        int year;
         struct list_head list; // list_head defined in <linux/types.h> [next, prev]
     };
 
@@ -36,7 +38,10 @@ static int __init simple_init(void) {
     list_add_tail(&person -> list, &birthday_list); // <linux/list.h>
 
     // We need 4 more entires into the linked list
-    struct birthday *person2, *person3,  *person4, *person5;
+    struct birthday *person2;
+    struct birthday *person3;
+    struct birthday *person4;
+    struct birthday *person5;
 
     // Allocate memory, and make sure of it
     person2 = kmalloc(sizeof(*person2), GFP_KERNEL); if (!person2) { printk(KERN_ALERT "Could not allocate memory for person2! Exiting!\n"); return 0; }
@@ -48,7 +53,7 @@ static int __init simple_init(void) {
     person2 -> day = 3; person2 -> month = 9; person2 -> year = 1996;
     person3 -> day = 4; person3 -> month = 10; person3 -> year = 1997;
     person4 -> day = 5; person4 -> month = 11; person4 -> year = 1998;
-    person4 -> day = 6; person4 -> month = 12; person4 -> year = 1999;
+    person5 -> day = 6; person5 -> month = 12; person5 -> year = 1999;
 
     // Push our new entires back into the struct (birthday_list)
     list_add_tail(&person2 -> list, &birthday_list); // <linux/list.h>
@@ -57,10 +62,10 @@ static int __init simple_init(void) {
     list_add_tail(&person5 -> list, &birthday_list); // <linux/list.h>
 
     // Print out our birthday linked list
-    // struct birthday *ptr; // Used for traversing the list [location]
-    // list_for_each_entry(ptr, &birthday_list, list) { // <linux/list.h>
-    //     printk(KERN_INFO "Added Birthday! Day: %d\tMonth: %d\tYear: %d\n", ptr -> day, ptr -> month, ptr -> year);
-    // }
+    struct birthday *ptr; // Used for traversing the list [location]
+    list_for_each_entry(ptr, &birthday_list, list) { // <linux/list.h>
+        printk(KERN_INFO "Added Birthday! Day: %d\tMonth: %d\tYear: %d\n", ptr -> day, ptr -> month, ptr -> year);
+    }
 
     return 0;
 }
