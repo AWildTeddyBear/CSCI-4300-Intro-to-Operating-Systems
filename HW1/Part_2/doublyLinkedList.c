@@ -2,69 +2,80 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/printk.h>
+#include <linux/slab.h>
 
 // Define our circular doubly linked list
-struct birthday_list {
+struct Birthday_List {
     int day, month, year;
-    struct birthday_list *next, *prev;
+    struct Birthday_List *next, *prev;
 };
 
 // Create our new list
-struct birthday_list* list = NULL;
-    
-// Function to pushBack data for the list
-void pushBack(struct birthday_list** begin, int day, int month, int year) {
-    // If our list is empty, let's make a new head with some data
-    if (*begin == NULL) {
-        // Create a new birthday_list with data
-        struct birthday_list* new = new birthday_list;
-        new -> day = day;
-        new -> month = month;
-        new -> year = year;
+struct Birthday_List* list = NULL;
 
-        // Assign our newly made birthday_list back
-        *begin = new;
+// Function to pushBack data for the list
+void pushBack(struct Birthday_List *begin, int day, int month, int year) {
+    // Create a new Birthday_List
+    struct Birthday_List *newList;
+    
+    // Let's allocate some memory for newList and make sure it was successful
+    newList = kmalloc(sizeof(*newList), GFP_KERNEL); if (!newList) { printk(KERN_ALERT "Could not allocate memory for newList! Exiting!\n"); return; }
+
+    // If our list is empty, let's make a new head with some data
+    if (begin == NULL) {
+        // Allocate memory
+        begin = kmalloc(sizeof(*begin), GFP_KERNEL); if (!begin) { printk(KERN_ALERT "Could not allocate memory for begin! Exiting!\n"); return; }
+
+        // Make it circular!
+        newList -> next = newList;
+        newList -> prev = newList;
+
+        // Fill some data
+        newList -> day = day;
+        newList -> month = month;
+        newList -> year = year;
+
+        // Assign our newly made Birthday_List back
+        *begin = newList;
     } else {
         // List isn't empty
 
-        // Find the last birthday_list
-        birthday_list *end = (*begin) -> prev;
+        // Find the last Birthday_List element
+        Birthday_List *end = begin -> prev;
 
-        // Create our new birthday_list with data
-        struct birthday_list* new = new birthday_list;
-        new -> day = day;
-        new -> month = month;
-        new -> year = year;
+        // Make it circular!
+        newList -> next = begin;
+        newList -> prev = end;
 
-        // Start will be next of new
-        new -> next = *begin;
+        // Fill some data
+        newList -> day = day;
+        newList -> month = month;
+        newList -> year = year;
 
-        // Make new previous of start
-        (*begin) -> prev = new;
-
-        // Make end prev of new
-        new -> prev = end;
-
-        // Make new next of old end
-        end -> next = new;
+        // Circular
+        end -> next = newList;
+        begin -> prev = newList;
     }
 }
 
 // Pops the last element out of the list (deletes)
-void pop(struct birthday_list *list) {
+void pop(struct Birthday_List *inputList) {
     // Set our previous node's front element to be the element in front of us
-    list -> prev -> next = list -> next;
+    inputList -> prev -> next = inputList -> next;
     
     // Set our next node's previous element to be the element behind us
-    list -> next -> prev = list -> prev;
+    inputList -> next -> prev = inputList -> prev;
 }
 
 // Function for iterating fowards in the list
-void print_iterate_fowards(struct birthday_list** begin) {
+void print_iterate_fowards(struct Birthday_List** begin) {
+    // Let's allocate some memory for newList and make sure it was successful
+    begin = kmalloc(sizeof(*begin), GFP_KERNEL); if (!begin) { printk(KERN_ALERT "Could not allocate memory for begin! Exiting!\n"); return; }
+
     printk(KERN_INFO "Iterating Fowards!\n");
     
     // Point to the starting element in the list
-    struct birthday_list *temp = begin;
+    struct Birthday_List *temp = begin;
 
     // Iterate through our list until we hit where we started
     while (temp -> next != begin) {
@@ -76,11 +87,14 @@ void print_iterate_fowards(struct birthday_list** begin) {
 }
 
 // Function for iterating backwards in the list
-void deletePrint_backwards(struct birthday_list** begin) {
+void deletePrint_backwards(struct Birthday_List** begin) {
+    // Let's allocate some memory for newList and make sure it was successful
+    begin = kmalloc(sizeof(*begin), GFP_KERNEL); if (!begin) { printk(KERN_ALERT "Could not allocate memory for begin! Exiting!\n"); return; }
+
     printk(KERN_INFO "Iterating Backwards!\n");
 
     // Point to the last element in the list as our start
-    struct birthday_list *end = begin -> prev;
+    struct Birthday_List *end = begin -> prev;
 
     while (end -> prev != NULL) {
         printk(KERN_INFO "Deleted Birthday! Day: %d\tMonth: %d\tYear: %d\t\n", end -> day, end -> month, end -> year);
@@ -105,7 +119,7 @@ static int __init doubly_init(void) {
     pushBack(&list, 6, 12, 1999);
 
     // Print our list!
-    print_iterate_fowards(list);
+    print_iterate_fowards(&list);
 
     return 0;
 }
@@ -115,7 +129,7 @@ static void __exit doubly_exit(void) {
     printk(KERN_NOTICE "Removing Birthday Module\n");
 
     // Print our list as we delete it
-    deletePrint_backwards(list);
+    deletePrint_backwards(&list);
 }
 
 // Macros for registering module entry and exit points.
