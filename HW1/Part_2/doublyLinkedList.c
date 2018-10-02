@@ -80,17 +80,21 @@ static int __init doubly_init(void) {
 static void __exit doubly_exit(void) {
     printk(KERN_NOTICE "Removing Birthday Module\n");
 
-    struct Birthday_List *currentNode;
-    currentNode = head;
+    // Store the last element
+    struct Birthday_List *temp;
+    temp = head -> prev;
+
+    // Cut the list
+    head -> prev = NULL;
 
     // Delete our list in reverse order -- make sure that we don't access some pointer that's null (empty list)
-    while (currentNode -> prev != NULL) {
+    while (temp -> prev != NULL) {
         // Delete the previous node (as we want reverse order)
-        deleteNodeSafe(&head, currentNode);
-        printk(KERN_INFO "Delete!\n");
+        deleteNodeSafe(&temp, temp);
+        printk(KERN_INFO "Delete! Info Year: %d\n", temp -> year);
 
         // Roll back in the list
-        currentNode = currentNode -> prev;
+        temp = temp -> prev;
     }
 }
 
