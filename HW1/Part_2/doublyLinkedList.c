@@ -14,50 +14,51 @@ struct Birthday_List {
 struct Birthday_List* head = NULL; 
 
 // Function for deleting a node out of the list
-void deleteNode(struct Birthday_List **head_ref, struct Birthday_List *del) { 
-    // Base case
+void deleteNodeSafe(struct Birthday_List **head_ref, struct Birthday_List *del) {
+    // Make sure that neither of our inputs are empty lists
     if (*head_ref == NULL || del == NULL) return;
 
-    //
+    // If our head and delete struct are equal then iterate fowards once
     if (*head_ref == del) *head_ref = del -> next;
 
-    //
+    // If our next exists, then unlink next
     if (del -> next != NULL) del -> next -> prev = del -> prev;
 
-    //
+    // If our prev exists, then unlink prev
     if (del -> prev != NULL) del -> prev -> next = del -> next; 
 
+    // Debug info out to kernel logs
     printk(KERN_INFO "Removing Birthday!\tDay: %d\tMonth: %d\tYear: %d\n", del -> day, del -> month, del -> year);
 
-    //
+    // Actually delete the struct we wanted since it was entirely isolated now
     kfree(del);
     return; 
 }      
 
-// Function for pushing back another node to the list with data
+// Function for pushing a new element node into the list
 void pushBack(struct Birthday_List** head_ref, int day, int month, int year) {
     // Allocate memory and check
     struct Birthday_List* new_node = kmalloc(sizeof(struct Birthday_List), GFP_KERNEL);
     if (!new_node) { printk(KERN_ALERT "Could not allocate memory for new_node! Exiting!\n"); return; }
 
-    //
+    // Insert some data into our new struct
     new_node -> day = day;
     new_node -> month = month;
     new_node -> year = year;
 
-    //
+    // Make our previous pointer null
     new_node -> prev = NULL;
 
-    //
+    // Make the next pointer the head
     new_node -> next = (*head_ref);
 
-    //
+    // If our head exists, then we assign our new node to head's previous
     if ((*head_ref) != NULL) (*head_ref) -> prev = new_node;
 
-    //
+    // Debug info out to kernel logs
     printk(KERN_INFO "Adding Birthday!\tDay: %d\tMonth: %d\tYear: %d\n", new_node -> day, new_node -> month, new_node -> year);
 
-    //
+    // Link our head to our new node
     (*head_ref) = new_node;
 } 
 
@@ -65,7 +66,7 @@ void pushBack(struct Birthday_List** head_ref, int day, int month, int year) {
 static int __init doubly_init(void) {
     printk(KERN_NOTICE "Loading Birthday Module\n");
 
-    // Begin to insert our data now
+    // Insert example data
     pushBack(&head, 2, 8, 1995);
     pushBack(&head, 3, 9, 1996);
     pushBack(&head, 4, 10, 1997);
@@ -79,11 +80,23 @@ static int __init doubly_init(void) {
 static void __exit doubly_exit(void) {
     printk(KERN_NOTICE "Removing Birthday Module\n");
 
+    struct Birthday_List *currentNode;
+    currentNode = head;
+
+    // Delete our list in reverse order -- make sure that we don't access some pointer that's null (empty list)
+    while (currentNode -> prev != NULL) {
+        // Delete the previous node (as we want reverse order)
+        deleteNodeSafe(&head, currentNode);
+        printk(KERN_INFO "Delete!\n");
+
+        // Roll back in the list
+        currentNode = currentNode -> prev;
+    }
 }
 
 // Macros for registering module entry and exit points.
 module_init(doubly_init);
 module_exit(doubly_exit);
 MODULE_LICENSE("GPL");
-MODULE_DESCRIPTION("CSCI-4300 Birthday Kernel Module");
+MODULE_DESCRIPTION("CSCI-4300 Birthday Kernel Module Part 2");
 MODULE_AUTHOR("AWildTeddyBear");

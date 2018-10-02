@@ -86,5 +86,5 @@ static void __exit single_exit(void) {
 module_init(single_init);
 module_exit(single_exit);
 MODULE_LICENSE("GPL");
-MODULE_DESCRIPTION("CSCI-4300 Birthday Kernel Module");
+MODULE_DESCRIPTION("CSCI-4300 Birthday Kernel Module Part 1");
 MODULE_AUTHOR("AWildTeddyBear");
