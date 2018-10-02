@@ -36,7 +36,7 @@ void pushBack(struct Birthday_List *begin, int day, int month, int year) {
         newList -> year = year;
 
         // Assign our newly made Birthday_List back
-        *begin = newList;
+        begin = newList;
     } else {
         // List isn't empty
 
