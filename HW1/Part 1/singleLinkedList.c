@@ -8,9 +8,7 @@
 
 // Define our struct
 struct birthday {
-    int day;
-    int month;
-    int year;
+    int day, month, year;
     struct list_head list; // list_head defined in <linux/types.h> [next, prev]
 };
 
@@ -18,7 +16,7 @@ struct birthday {
 static LIST_HEAD(birthday_list); // struct list_head birthday_list;
 
 // This function is called when the module is loaded.
-static int __init simple_init(void) {
+static int __init single_init(void) {
     printk(KERN_NOTICE "Loading Birthday Module\n");
 
     // Create our first birthday object
@@ -38,10 +36,7 @@ static int __init simple_init(void) {
     list_add_tail(&person -> list, &birthday_list); // <linux/list.h>
 
     // We need 4 more entires into the linked list
-    struct birthday *person2;
-    struct birthday *person3;
-    struct birthday *person4;
-    struct birthday *person5;
+    struct birthday *person2, *person3, *person4, *person5;
 
     // Allocate memory, and make sure of it
     person2 = kmalloc(sizeof(*person2), GFP_KERNEL); if (!person2) { printk(KERN_ALERT "Could not allocate memory for person2! Exiting!\n"); return 0; }
@@ -71,7 +66,7 @@ static int __init simple_init(void) {
 }
 
 // This function is called when the module is removed.
-static void __exit simple_exit(void) {
+static void __exit single_exit(void) {
     printk(KERN_NOTICE "Removing Birthday Module\n");
 
     // Now we want to remove our linked list in reverse order.
@@ -88,8 +83,8 @@ static void __exit simple_exit(void) {
 }
 
 // Macros for registering module entry and exit points.
-module_init(simple_init);
-module_exit(simple_exit);
+module_init(single_init);
+module_exit(single_exit);
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("CSCI-4300 Birthday Kernel Module");
 MODULE_AUTHOR("AWildTeddyBear");
