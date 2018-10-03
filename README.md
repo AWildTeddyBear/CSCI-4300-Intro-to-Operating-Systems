@@ -28,7 +28,7 @@ Or ya know, just leave a comment on the commit I borked.
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](https://github.com/AWildTeddyBear/CSCI-3000/blob/master/LICENSE) file for details.
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](https://github.com/AWildTeddyBear/CSCI-4300-Intro-to-Operating-Systems/blob/master/LICENSE) file for details.
 
 ## Acknowledgments
 
