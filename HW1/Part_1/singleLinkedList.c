@@ -1,3 +1,9 @@
+/*
+    [Proof of ownership]
+    File hash of file submitted for this project: E34A69633B298CE09304AB4BEAFAC639F08198D5DF5868AB84ADD46029BFCA5AA5925DA5CE5FB9D14BEF917BD758461A2A54A2E8B0FFBEE07D0A339C927700CB
+    [Proof of ownership]
+*/
+
 #include <linux/init.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
