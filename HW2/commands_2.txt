@@ -1,0 +1,6 @@
+date
+who
+cal
+pwd
+ls -l
+ps
